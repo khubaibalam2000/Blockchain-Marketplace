@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="web3.min.js"></script>
+    <title>Document</title>
+</head>
+
+<script>
+
+
+
+    let account;
+    let real_balance;
+    let contractAccount = "0x35D3d2a3321E8746acdba344Fb08280DdE49167c";
+    let contractAddress = "0xDa458dCE595788DE74391d4Bf31589C8B706c7D0";
+
+    const ConnectWithMetamaskContract = async () => {
+
+        const connectmetamask = async () => {
+            if(window.ethereum !== "undefined") {
+                    const accounts = await ethereum.request({method: "eth_requestAccounts"});
+                    account = accounts[0];
+                    console.log(account);
+                    return true;
+                }
+        }
+
+        const connectContract = async () => {
+            const ABI = [
+                {
+                    "inputs": [],
+                    "name": "deposit",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "withdraw",
+                    "outputs": [],
+                    "stateMutability": "payable",
+                    "type": "function"
+                }
+            ];
+
+            window.web3 = await new Web3(window.ethereum);
+            window.contract = await new window.web3.eth.Contract(ABI, contractAddress);
+            console.log("Conneceted to contract");
+        }
+
+        await connectmetamask();
+        await connectContract();
+        getBalanceOfContract();
+    }
+
+    const getBalanceOfContract = async () => {
+        document.getElementById("contract balance").value = Web3.utils.fromWei(await web3.eth.getBalance(contractAddress), 'ether');;
+    }
+
+    const DepositEtherToAmazon = async () => {
+        await window.contract.methods.deposit().send({from : contractAccount});
+        getBalanceOfContract();
+    }
+
+
+</script>
+
+<body>
+    <div style="margin-left: 20%; margin-top: 10%;"><h1>Amazon Dashboard</h1></div>
+    <div style="margin: 20%; margin-top: 10%;">
+        <div style="align-items: center;">
+            
+                <button onclick="ConnectWithMetamaskContract();">
+                    Sign-In
+                </button>
+                <br>
+                <br>
+                <span>Contract Balance :</span>
+                <input type="text" name="" id="contract balance" value="Please sign in first" disabled />
+                <span> Ether </span>
+                <button onclick="getBalanceOfContract();">
+                    Refresh
+                </button>
+                <br>
+                <br>
+                <button onclick="DepositEtherToAmazon();">
+                    Redeem
+                </button>
+          
+        </div>
+    </div>
+</body>
+</html>
